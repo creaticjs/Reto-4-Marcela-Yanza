@@ -15,7 +15,7 @@
 	</head>
 	<body>
 
-		<div class="container">
+		<div class="container" id="contenedorPrincipal">
 			
 			<div style="margin-top: 20px">
 
@@ -30,7 +30,10 @@
 				      <li class="nav-item active">
 				        <a class="nav-link" href="#" onclick="mostrarCategorias()">Categorías</a>
 				      </li>
-				      <li class="nav-item dropdown">
+				      <li class="nav-item active">
+				        <a class="nav-link" href="#" @click="mostrarTrending()">Trending</a>
+				      </li>
+				      <li class="nav-item active dropdown">
 				        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				          Perfil
 				        </a>
@@ -50,8 +53,9 @@
 
 			</div>
 
-		</div>		
+		</div>	
 
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
 		<script
 		  src="https://code.jquery.com/jquery-3.3.1.js"
@@ -69,6 +73,50 @@
 	    ></script>
 
 	    <script type="text/javascript">
+
+	    	var contenedorPrincipal = new Vue(
+			{
+				el: "#contenedorPrincipal",
+				data:
+				{
+					visibleTrending: false
+				},
+				methods:
+				{
+					pintarCabeceraTrending: function()
+			    	{
+			    		var texto = `<h2 style="margin-bottom: 30px">Trending</h2>`;
+			    		return texto;
+			    	},
+			    	obtenerTrending: function(datos)
+			    	{
+			    		var cabecera = contenedorPrincipal.pintarCabeceraTrending();
+			    		var canciones = datos.data;
+			    		var cuerpo = '';
+
+			    		for (var i = 0; i < canciones.length; i++) 
+			    		{	
+			    			cuerpo = cuerpo + pintarCancion(canciones[i]);
+			    		}
+			    		cuerpo = cabecera + cuerpo;
+			    		return cuerpo;
+			    	},
+					mostrarTrending: function()
+					{
+						var url = 'https://api.mixcloud.com/popular/hot/?limit=20';
+			    		getPeticion(url)
+				    	.then(function(data)
+				    	{
+				    		data = JSON.parse(data);
+				    		var texto = contenedorPrincipal.obtenerTrending(data);
+				    		$('#contenedor').html(texto);
+				    	}).catch(function(err)
+				    	{
+				    		console.log(err);
+				    	});
+					}
+				}
+			});
 
 	    	var cancionesLista;
 
@@ -199,7 +247,6 @@
 	    		var fecha = cancion.created_time;
 	    		var datos = fecha.split('T');
 	    		fecha = datos[0];
-	    		console.log("FECHA = "+ fecha);
 	    		return fecha;
 	    	}
 
